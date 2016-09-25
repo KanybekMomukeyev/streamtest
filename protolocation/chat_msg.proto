@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package protolocation;
+
+service Chat {
+    rpc Chat(stream Msg) returns (stream Msg) {}
+}
+
+// only support the string for now
+message Msg {
+    string content = 1;
+    string title = 2;
+}
