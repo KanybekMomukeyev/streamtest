@@ -101,6 +101,7 @@ func input() {
 }
 
 func main() {
+
 	flag.Parse()
 	fmt.Println("start the program")
 
