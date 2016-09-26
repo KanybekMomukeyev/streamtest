@@ -13,14 +13,20 @@ import (
 )
 
 var (
-	serverAddr *string
-	title      string
+	serverAddr = "localhost:10000"
+	title = "constTitle"
 )
 
 func Chat(letters ...string) error {
-	// get connection for chat
-	conn := connect(serverAddr)
+	conn, err := grpc.Dial(serverAddr, grpc.WithInsecure())
+
+	if err != nil {
+		grpclog.Fatalf("fail to dial: %v", err)
+	}
+
+	grpclog.Println("client started...")
 	defer conn.Close()
+
 	client := pb.NewChatClient(conn)
 
 	stream, err := client.Chat(context.Background())
@@ -35,7 +41,7 @@ func Chat(letters ...string) error {
 
 	go func() {
 		for {
-			in, err := stream.Recv()
+			messageReceived, err := stream.Recv()
 			if err == io.EOF {
 				// read done
 				close(waitc)
@@ -46,7 +52,9 @@ func Chat(letters ...string) error {
 				recevieErr = err
 				return
 			}
-			grpclog.Printf("client -- server status: %s", in.Content)
+
+			grpclog.Printf("client -- server status: %s", messageReceived.Content)
+			grpclog.Printf("client -- Title %s", messageReceived.Title)
 		}
 	}()
 
@@ -69,42 +77,14 @@ func Chat(letters ...string) error {
 	return nil
 }
 
-func InitChatClient(t string, srvAddr *string) {
-	title = t
-	serverAddr = srvAddr
-}
-
-func connect(srvAddr *string) *grpc.ClientConn {
-	conn, err := grpc.Dial(*srvAddr, grpc.WithInsecure())
-
-	if err != nil {
-		grpclog.Fatalf("fail to dial: %v", err)
-	}
-	grpclog.Println("client started...")
-
-	return conn
-}
-
 var (
 	msgc = make(chan string) // the message channel
-	//serverAddr = flag.String("server_addr", "127.0.0.1:10000", "The server address in the format of host:port")
-	myTitle    = flag.String("title", "", "The name show to your friend")
 )
 
-// an input from command line
-func input() {
-	for {
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
-		msgc <- text
-	}
-}
-
 func main() {
-
 	flag.Parse()
-	fmt.Println("start the program")
 
+	fmt.Println("start the program")
 	for {
 		// start the app
 		waitc := make(chan struct{}) // a wait lock
@@ -113,19 +93,26 @@ func main() {
 		go func() {
 			for {
 				msg := <-msgc // a message to send
-				InitChatClient(*myTitle, serverAddr)
+
 				err := Chat(msg)
+
 				if err != nil {
-					// restart the client
 					fmt.Printf("send Err: %v", err)
 				}
 			}
 		}()
 
 		// start the input thread
-		go input()
+		go func() {
+			for {
+				reader := bufio.NewReader(os.Stdin)
+				text, _ := reader.ReadString('\n')
+				msgc <- text
+			}
+		}()
 
 		<-waitc
+
 		// finished in this round restart the app
 		fmt.Println("restart the app")
 	}

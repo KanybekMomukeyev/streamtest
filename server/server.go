@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net"
-	pb "github.com/KanybekMomukeyev/streamtest/protolocation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
+	pb "github.com/KanybekMomukeyev/streamtest/protolocation"
 )
 
 var (
@@ -36,14 +36,10 @@ func (*chat_server) Chat(stream pb.Chat_ChatServer) error {
 		content := in.Content
 		title := in.Title
 
-		if title == "" {
-			title = "Unknown"
-		}
-
 		grpclog.Printf("server -- received message:\n%v: %v", title, content)
-		revMsg := "received"
+		revMsg := "message from server content received"
 
-		stream.Send(&pb.Msg{Content: revMsg})
+		stream.Send(&pb.Msg{Content: revMsg, Title:"server title"})
 	}
 }
 
@@ -52,8 +48,12 @@ func Shutdown() {
 	grpcServer.Stop()
 }
 
-func InitChatServer() {
+func main() {
+	flag.Parse()
+
+	fmt.Println("start the server")
 	grpclog.Println("start server...")
+
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
@@ -63,11 +63,6 @@ func InitChatServer() {
 	grpcServer = grpc.NewServer()
 	pb.RegisterChatServer(grpcServer, new(chat_server))
 	grpcServer.Serve(lis)
-	grpclog.Println("server shutdown...")
-}
 
-func main() {
-	flag.Parse()
-	fmt.Println("start the server")
-	InitChatServer()
+	grpclog.Println("server shutdown...")
 }
