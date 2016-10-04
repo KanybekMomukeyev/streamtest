@@ -45,8 +45,55 @@ func fanIn(input1, input2 <-chan string) <-chan string {
 	return c
 }
 
+func fake_fibonacci(n int, c chan int) {
+	for i := 0; i < n; i++ {
+		c <- i
+	}
+	//defer close(c)
+}
+
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+		select {
+		case c <- x:
+			x, y = y, x+y
+		case <-quit:
+			fmt.Println("quit")
+			return
+		}
+	}
+}
+
+func call_fibonacci()  {
+		c := make(chan int)
+		quit := make(chan int)
+		go func() {
+			for i := 0; i < 10; i++ {
+				fmt.Println(<-c)
+			}
+			quit <- 0
+		}()
+		fibonacci(c, quit)
+}
+
 func main() {
 
+	call_fibonacci()
+
+	//c := make(chan int, 10)
+	//go fake_fibonacci(cap(c), c)
+	//
+	//for i := 0; i < cap(c); i++ {
+	//	fmt.Println(<-c)
+	//}
+
+	//for i := range c {
+	//	fmt.Println(i)
+	//}
+}
+
+func someMethod()  {
 	ch := make(chan int, 2)
 	ch <- 1
 	ch <- 2
@@ -71,9 +118,6 @@ func main() {
 
 	fmt.Println("You're both boring; I'm leaving.")
 
-
-
-
 	// create channel
 	c := make(chan string)
 
@@ -95,4 +139,5 @@ func main() {
 	time.Sleep(2 * time.Second)
 
 	fmt.Println("You're boring; I'm leaving.")
+
 }
