@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"github.com/KanybekMomukeyev/streamtest/database"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	pb "github.com/KanybekMomukeyev/streamtest/protolocation"
 )
 
 var (
-	//port       = flag.Int("port", 10000, "The server port")
-	port       = flag.Int("port", 8080, "The server port")
+	port       = flag.Int("port", 10000, "The server port")
+	//port       = flag.Int("port", 8080, "The server port")
 	grpcServer *grpc.Server
 )
 
@@ -39,6 +40,8 @@ func (*chat_server) Chat(stream pb.Chat_ChatServer) error {
 
 		grpclog.Printf("server -- received message:\n%v: %v", title, content)
 		revMsg := "message from server content received"
+
+		database.SomeDatabaseFunction()
 
 		stream.Send(&pb.Msg{Content: revMsg, Title:"server title"})
 	}
