@@ -13,6 +13,12 @@ ADD server /gopath/src/github.com/KanybekMomukeyev/streamtest/server
 RUN go get google.golang.org/grpc
 RUN go get github.com/KanybekMomukeyev/streamtest
 
+#RUN cd $SRC_DIR; go build -o myapp; cp myapp /app/
+#ENTRYPOINT ["./myapp"]
+
+#RUN go install github.com/KanybekMomukeyev/MathApp
+
+
 EXPOSE 8080
 CMD ["go", "run", "/server/server.go"]
 

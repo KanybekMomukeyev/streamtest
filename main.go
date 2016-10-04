@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"time"
 	"math/rand"
+	"bufio"
+	"os"
+	"flag"
 )
 
 //func boring(msg string) {
@@ -77,21 +80,62 @@ func call_fibonacci()  {
 		fibonacci(c, quit)
 }
 
+//func main() {
+//
+//	call_fibonacci()
+//
+//	//c := make(chan int, 10)
+//	//go fake_fibonacci(cap(c), c)
+//	//
+//	//for i := 0; i < cap(c); i++ {
+//	//	fmt.Println(<-c)
+//	//}
+//
+//	//for i := range c {
+//	//	fmt.Println(i)
+//	//}
+//}
+var (
+	msgc = make(chan string) // the message channel
+)
+
 func main() {
+	flag.Parse()
 
-	call_fibonacci()
+	fmt.Println("start the program")
+	for {
+		// start the app
+		waitc := make(chan struct{}) // a wait lock
 
-	//c := make(chan int, 10)
-	//go fake_fibonacci(cap(c), c)
-	//
-	//for i := 0; i < cap(c); i++ {
-	//	fmt.Println(<-c)
-	//}
+		// start the client thread
+		go func() {
+			for {
+				msg := <-msgc // a message to send
+				print(msg)
 
-	//for i := range c {
-	//	fmt.Println(i)
-	//}
+				if msg == "break" {
+					break
+				}
+
+			}
+		}()
+
+		// start the input thread
+		go func() {
+			for {
+				reader := bufio.NewReader(os.Stdin)
+				text, _ := reader.ReadString('\n')
+				msgc <- text
+			}
+		}()
+
+		<-waitc
+
+		// finished in this round restart the app
+		fmt.Println("restart the app")
+	}
 }
+
 
 func someMethod()  {
 	ch := make(chan int, 2)
