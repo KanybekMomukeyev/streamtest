@@ -36,8 +36,8 @@ type Place struct {
 func SomeDatabaseFunction() {
 	// this Pings the database trying to connect, panics on error
 	// use sqlx.Open() for sql.Open() semantics
-
-	db, err := sql.Open("postgres", "kano:kano@tcp(172.17.0.2:5432)/streamtestdb")
+	//db, err := sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/hello")
+	db, err := sql.Open("postgres", "kano:nazgulum@tcp(172.17.0.2:5432)/streamtestdb")
 	//db, err := sqlx.Connect("postgres", "user=kano dbname=streamtestdb sslmode=disable")
 
 	if err != nil {
