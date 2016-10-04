@@ -13,10 +13,10 @@ import (
 )
 
 var (
-	//serverAddr = "192.168.1.204:10000" failed
-	//serverAddr = "192.168.1.204:6060" failed
+	//serverAddr = "192.168.1.204:10000"
 	serverAddr = "192.168.1.204:8080"
-	//serverAddr = "localhost:10000"
+	//serverAddr = "192.168.1.204:80"
+	//serverAddr = "localhost:8080"
 	title = "constTitle"
 )
 
