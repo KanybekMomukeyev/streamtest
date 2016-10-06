@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"bufio"
 	"os"
+	"github.com/KanybekMomukeyev/streamtest/database"
 )
 
 var (
@@ -84,7 +85,7 @@ var (
 
 func main() {
 	flag.Parse()
-
+	//database.SomeMethodBleve()
 	fmt.Println("start the program")
 	for {
 		// start the app

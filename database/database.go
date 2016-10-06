@@ -4,6 +4,7 @@ import (
 	_ "github.com/lib/pq"
 	"database/sql"
 	"github.com/jmoiron/sqlx"
+	"github.com/blevesearch/bleve"
 	"log"
 	"fmt"
 )
@@ -118,4 +119,33 @@ func SomeDatabaseFunction() {
 	// as the name -> db mapping, so struct fields are lowercased and the `db` tag
 	// is taken into consideration.
 	rows, err = db.NamedQuery(`SELECT * FROM person WHERE first_name=:first_name`, jason)
+}
+
+func SomeMethodBleve() {
+	// open a new index
+	mapping := bleve.NewIndexMapping()
+	index, err := bleve.New("example.bleve", mapping)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	data := struct {
+		Name string
+	}{
+		Name: "text",
+	}
+
+	// index some data
+	index.Index("id", data)
+
+	// search for some text
+	query := bleve.NewMatchQuery("text")
+	search := bleve.NewSearchRequest(query)
+	searchResults, err := index.Search(search)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(searchResults)
 }
