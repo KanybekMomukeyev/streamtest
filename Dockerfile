@@ -24,7 +24,8 @@ RUN go get github.com/KanybekMomukeyev/streamtest
 
 
 EXPOSE 8080
+CMD ["go", "run", "main.go"]
 #CMD ["go", "run", "/server/server.go"]
 
 #ENTRYPOINT ["/gopath/bin/testingpackages"]
-ENTRYPOINT /go/bin/streamtest
+#ENTRYPOINT /go/bin/streamtest
